@@ -1,0 +1,100 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Últimas Noticias - Enlace Total</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+    }
+
+    .noticias-banner {
+      display: flex;
+      align-items: center;
+      background-color: #ffffff;
+      color: #003366;
+      height: 50px;
+      border-bottom: 3px solid #003366;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      font-size: 16px;
+    }
+
+    .noticias-titulo {
+      background-color: #FFD700;
+      color: #003366;
+      padding: 0 15px;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .noticias-contenido {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .noticias-deslizar {
+      display: inline-block;
+      white-space: nowrap;
+      padding-left: 100%;
+      animation: deslizar 25s linear infinite;
+    }
+
+    .noticias-deslizar a {
+      color: #003366;
+      text-decoration: none;
+      margin-right: 50px;
+      font-weight: 500;
+    }
+
+    .noticias-deslizar a:hover {
+      text-decoration: underline;
+    }
+
+    @keyframes deslizar {
+      0% { transform: translateX(0%); }
+      100% { transform: translateX(-100%); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="noticias-banner">
+    <div class="noticias-titulo">Últimas noticias</div>
+    <div class="noticias-contenido">
+      <div id="entradas" class="noticias-deslizar">Cargando noticias...</div>
+    </div>
+  </div>
+
+  <script>
+    fetch("https://enlacetotalec.wordpress.com/feed/")
+      .then(response => response.text())
+      .then(data => {
+        const parser = new DOMParser();
+        const xml = parser.parseFromString(data, "application/xml");
+        const items = xml.querySelectorAll("item");
+        const contenedor = document.getElementById("entradas");
+        contenedor.innerHTML = ""; // Limpiar
+
+        for (let i = 0; i < Math.min(5, items.length); i++) {
+          const titulo = items[i].querySelector("title").textContent;
+          const link = items[i].querySelector("link").textContent;
+
+          const a = document.createElement("a");
+          a.href = link;
+          a.target = "_blank";
+          a.textContent = titulo;
+          contenedor.appendChild(a);
+        }
+      })
+      .catch(error => {
+        console.error("Error al cargar el feed:", error);
+        document.getElementById("entradas").textContent = "No se pudieron cargar las noticias.";
+      });
+  </script>
+
+</body>
+</html>
